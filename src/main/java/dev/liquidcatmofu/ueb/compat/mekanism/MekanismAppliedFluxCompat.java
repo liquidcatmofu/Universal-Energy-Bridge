@@ -7,6 +7,7 @@ import dev.liquidcatmofu.ueb.compat.BlockEntityCompat;
 import dev.liquidcatmofu.ueb.compat.appliedflux.AppliedFluxMEStorage;
 import dev.liquidcatmofu.ueb.config.BridgeConfig;
 import mekanism.common.capabilities.Capabilities;
+import mekanism.common.tile.TileEntityEnergyCube;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,19 +21,20 @@ public final class MekanismAppliedFluxCompat implements BlockEntityCompat {
         }
         BlockEntity blockEntity = event.getObject();
 
-        // AppliedFlux already has a dedicated direct Induction Port handler.
-        // Add a native long path here only for the Quantum Entangloporter.
-        if (!MekanismCompatTargets.isQuantumEntangloporter(blockEntity)) {
+        if (!MekanismCompatTargets.isAppliedFluxEndpoint(blockEntity)) {
             return;
         }
+
+        Component description = blockEntity instanceof TileEntityEnergyCube
+                ? Component.literal("Mekanism Energy Cube")
+                : Component.literal("Mekanism Quantum Entangloporter");
 
         FactoryCapabilityProvider<MEStorage> provider = new FactoryCapabilityProvider<>(
                 appeng.capabilities.Capabilities.STORAGE,
                 side -> blockEntity.getCapability(Capabilities.STRICT_ENERGY, side)
                         .resolve()
                         .map(MekanismUniversalEnergyStorage::new)
-                        .map(storage -> (MEStorage) new AppliedFluxMEStorage(
-                                storage, Component.literal("Mekanism Quantum Entangloporter")))
+                        .map(storage -> (MEStorage) new AppliedFluxMEStorage(storage, description))
                         .orElse(null));
 
         event.addCapability(new ResourceLocation(UniversalEnergyBridge.MOD_ID, "mekanism_applied_flux"), provider);
