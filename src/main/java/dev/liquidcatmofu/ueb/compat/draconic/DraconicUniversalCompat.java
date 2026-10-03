@@ -13,7 +13,7 @@ public final class DraconicUniversalCompat implements BlockEntityCompat {
         if (event.getObject() instanceof TileEnergyPylon pylon) {
             CapabilityAttachUtil.add(event, "draconic_universal",
                     UniversalEnergyCapabilities.ENERGY,
-                    new DraconicUniversalEnergyStorage(pylon.opAdapter));
+                    new DraconicUniversalEnergyStorage(pylon));
         }
     }
 }

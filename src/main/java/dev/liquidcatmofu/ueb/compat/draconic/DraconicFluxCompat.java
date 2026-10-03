@@ -16,7 +16,7 @@ public final class DraconicFluxCompat implements BlockEntityCompat {
             return;
         }
         if (event.getObject() instanceof TileEnergyPylon pylon) {
-            DraconicUniversalEnergyStorage endpoint = new DraconicUniversalEnergyStorage(pylon.opAdapter);
+            DraconicUniversalEnergyStorage endpoint = new DraconicUniversalEnergyStorage(pylon);
             CapabilityAttachUtil.add(event, "draconic_flux_networks",
                     FluxCapabilities.FN_ENERGY_STORAGE,
                     new UniversalToFluxEnergyStorage(endpoint));

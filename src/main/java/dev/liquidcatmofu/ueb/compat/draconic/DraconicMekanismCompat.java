@@ -16,7 +16,7 @@ public final class DraconicMekanismCompat implements BlockEntityCompat {
             return;
         }
         if (event.getObject() instanceof TileEnergyPylon pylon) {
-            DraconicUniversalEnergyStorage endpoint = new DraconicUniversalEnergyStorage(pylon.opAdapter);
+            DraconicUniversalEnergyStorage endpoint = new DraconicUniversalEnergyStorage(pylon);
             CapabilityAttachUtil.add(event, "draconic_mekanism",
                     Capabilities.STRICT_ENERGY,
                     new UniversalToMekanismEnergyHandler(endpoint));
