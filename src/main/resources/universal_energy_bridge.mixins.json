@@ -6,7 +6,12 @@
   "mixins": [
     "flux.NetworkStatisticsMixin",
     "flux.ServerFluxNetworkMixin",
-    "mekanism.InventoryFrequencyMixin"
+    "mekanism.InventoryFrequencyMixin",
+    "draconic.TileEnergyCoreExactIOMixin",
+    "draconic.OPStorageOPExactIOMixin"
+  ],
+  "client": [
+    "draconic.EnergyCoreGuiExactIOMixin"
   ],
   "injectors": {
     "defaultRequire": 1
