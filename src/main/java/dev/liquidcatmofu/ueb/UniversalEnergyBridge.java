@@ -5,6 +5,7 @@ import dev.liquidcatmofu.ueb.api.IUniversalEnergyStorage;
 import dev.liquidcatmofu.ueb.command.UebCommands;
 import dev.liquidcatmofu.ueb.compat.CompatDispatcher;
 import dev.liquidcatmofu.ueb.config.BridgeConfig;
+import dev.liquidcatmofu.ueb.config.BridgeServerConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,6 +33,7 @@ public final class UniversalEnergyBridge {
         modBus.addListener(this::commonSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BridgeConfig.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, BridgeServerConfig.SPEC);
 
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::attachCapabilities);
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
