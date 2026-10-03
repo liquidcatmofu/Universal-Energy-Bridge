@@ -35,7 +35,7 @@ public final class BridgeConfig {
                 .comment("Expose Draconic Evolution Energy Pylons as AppliedFlux FE external storage to AE2 storage buses.")
                 .define("draconicToAppliedFlux", true);
         MEKANISM_TO_DRACONIC = builder
-                .comment("Expose selected Mekanism large-storage endpoints through BrandonsCore OP.")
+                .comment("Expose selected Mekanism large-storage endpoints and Universal Cables through BrandonsCore OP using native sided Strict Energy.")
                 .define("mekanismToDraconic", true);
         MEKANISM_TO_APPLIED_FLUX = builder
                 .comment("Expose selected Mekanism endpoints directly as AppliedFlux FE external storage. Induction Matrix already has native AppliedFlux handling; this is mainly useful for Energy Cubes and Quantum Entangloporters.")

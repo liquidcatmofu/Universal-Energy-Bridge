@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.13] - 2026-10-04
+
+### Added
+
+- Expose Mekanism Universal Cables through BrandonsCore OP using each cable side's native Strict Energy capability.
+- Astral Mekanism and Evolved Mekanism cables are covered automatically because they use Mekanism's TileEntityUniversalCable; Evolved Mekanism Extras cable block entities are recognized explicitly without a compile dependency.
+
+### Changed
+
+- Draconic active push into Universal Cables can now stay on the signed-long OP/Strict Energy path instead of falling back to Forge Energy's Integer.MAX_VALUE-per-call limit.
+- Cable NORMAL/PULL/PUSH/NONE behavior remains owned by Mekanism. UEB dynamically resolves the native sided Strict Energy handler rather than reimplementing connection-mode rules.
+- Active cable pull and active machine/source push remain independent transfers; when both are enabled in the same tick their transferred amounts may add together, matching native Mekanism behavior.
+
 ## [0.1.0-alpha.12] - 2026-10-03
 
 ### Added
