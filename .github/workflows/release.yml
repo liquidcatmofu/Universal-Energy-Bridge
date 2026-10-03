@@ -1,0 +1,189 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*.*.*-*.*.*'
+
+permissions:
+  contents: read
+
+env:
+  BUILD_JAVA_VERSION: '21'
+  TARGET_JAVA_VERSION: '17'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      archives_name: ${{ steps.version.outputs.archives_name }}
+      minecraft_version: ${{ steps.version.outputs.minecraft_version }}
+      mod_version: ${{ steps.version.outputs.mod_version }}
+      publish_environment: ${{ steps.version.outputs.publish_environment }}
+      release_version: ${{ steps.version.outputs.release_version }}
+      release_type: ${{ steps.version.outputs.release_type }}
+      github_prerelease: ${{ steps.version.outputs.github_prerelease }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Verify tagged commit is on the default branch
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH"
+          tag_commit="$(git rev-parse "$GITHUB_REF_NAME^{commit}")"
+          scripts/verify-release-branch.sh             "$tag_commit"             "refs/remotes/origin/$DEFAULT_BRANCH"
+
+      - name: Validate release metadata
+        id: version
+        run: scripts/release-metadata.sh "${GITHUB_REF_NAME}"
+
+      - name: Set up build JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          distribution: temurin
+          java-version: ${{ env.BUILD_JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-provider: basic
+
+      - name: Build and test
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build --no-daemon --stacktrace
+
+      - name: Prepare release files
+        env:
+          ARCHIVES_NAME: ${{ steps.version.outputs.archives_name }}
+          MINECRAFT_VERSION: ${{ steps.version.outputs.minecraft_version }}
+          MOD_VERSION: ${{ steps.version.outputs.mod_version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+
+          forge_jar="build/libs/${ARCHIVES_NAME}-Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          test -f "$forge_jar"
+          cp "$forge_jar" dist/
+
+          scripts/extract-release-notes.sh "$MOD_VERSION" dist/release-notes.md
+          scripts/validate-release-jar.py "$forge_jar" "$MOD_VERSION"
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-${{ steps.version.outputs.release_version }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  github-release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-${{ needs.build.outputs.release_version }}
+          path: dist
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.build.outputs.release_version }}
+          GITHUB_PRERELEASE: ${{ needs.build.outputs.github_prerelease }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_flags=(--prerelease="$GITHUB_PRERELEASE")
+          if [[ "$GITHUB_PRERELEASE" == "true" ]]; then
+            release_flags+=(--latest=false)
+          fi
+          if gh release view "$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_VERSION" dist/*.jar --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$RELEASE_VERSION" --title "$RELEASE_VERSION" --notes-file dist/release-notes.md "${release_flags[@]}" --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_VERSION" dist/*.jar --verify-tag --title "$RELEASE_VERSION" --notes-file dist/release-notes.md "${release_flags[@]}" --repo "$GITHUB_REPOSITORY"
+          fi
+
+  modrinth:
+    if: ${{ vars.MODRINTH_PROJECT_ID != '' }}
+    needs: [build, github-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Modrinth token
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: test -n "$MODRINTH_TOKEN"
+
+      - name: Download release bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-${{ needs.build.outputs.release_version }}
+          path: dist
+
+      - name: Publish Forge to Modrinth
+        uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3.1
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: dist/${{ needs.build.outputs.archives_name }}-Forge-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
+          name: Forge-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version: Forge-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version-type: ${{ needs.build.outputs.release_type }}
+          changelog-file: dist/release-notes.md
+          loaders: forge
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          game-version-filter: none
+          environment: ${{ needs.build.outputs.publish_environment }}
+          java: ${{ env.TARGET_JAVA_VERSION }}
+          retry-attempts: 2
+          fail-mode: fail
+
+  curseforge:
+    if: ${{ vars.CURSEFORGE_PROJECT_ID != '' }}
+    needs: [build, github-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate CurseForge token
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: test -n "$CURSEFORGE_TOKEN"
+
+      - name: Download release bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-${{ needs.build.outputs.release_version }}
+          path: dist
+
+      - name: Publish Forge to CurseForge
+        uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3.1
+        with:
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: dist/${{ needs.build.outputs.archives_name }}-Forge-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
+          name: Forge-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version: Forge-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version-type: ${{ needs.build.outputs.release_type }}
+          changelog-file: dist/release-notes.md
+          loaders: forge
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          game-version-filter: none
+          environment: ${{ needs.build.outputs.publish_environment }}
+          java: ${{ env.TARGET_JAVA_VERSION }}
+          retry-attempts: 2
+          fail-mode: fail

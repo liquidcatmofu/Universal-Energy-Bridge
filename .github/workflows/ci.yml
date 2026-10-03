@@ -1,0 +1,297 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BUILD_JAVA_VERSION: '21'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up build JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          distribution: temurin
+          java-version: ${{ env.BUILD_JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-provider: basic
+
+      - name: Build and test
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build --no-daemon --stacktrace
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ github.event.repository.name }}
+          path: build/libs/*.jar
+          if-no-files-found: error
+
+  release-scripts-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Download build artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ github.event.repository.name }}
+          path: build/libs
+
+      - name: Check release script syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/release-metadata.sh
+          bash -n scripts/extract-release-notes.sh
+          bash -n scripts/verify-release-branch.sh
+          python3 -m py_compile scripts/changelog-entry.py scripts/validate-release-jar.py
+
+      - name: Validate current build artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          read_property() {
+            sed -n "s/^$1 *= *//p" gradle.properties | tr -d '\r'
+          }
+          archives_name="$(read_property archives_name)"
+          minecraft_version="$(read_property minecraft_version)"
+          mod_version="$(read_property mod_version)"
+          jar="build/libs/${archives_name}-Forge-${minecraft_version}-${mod_version}.jar"
+          test -f "$jar"
+          scripts/validate-release-jar.py "$jar" "$mod_version"
+
+      - name: Prepare isolated release fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixture="$RUNNER_TEMP/release-fixture"
+          rm -rf "$fixture"
+          mkdir -p "$fixture/scripts"
+          cp             scripts/release-metadata.sh             scripts/extract-release-notes.sh             scripts/changelog-entry.py             "$fixture/scripts/"
+
+          cat > "$fixture/gradle.properties" <<'EOF'
+          archives_name=ExampleMod
+          minecraft_version=1.20.1
+          mod_version=0.1.0
+          publish_environment=client | server
+          EOF
+
+          cat > "$fixture/CHANGELOG.md" <<'EOF'
+          # Changelog
+
+          All notable changes to this project will be documented in this file.
+
+          ## [Unreleased]
+          EOF
+
+      - name: Test stable release metadata and notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release-fixture"
+
+          cat >> CHANGELOG.md <<'EOF'
+
+          ## [0.1.0] - 2026-10-02
+
+          ### Added
+
+          - CI release-script test entry.
+          EOF
+
+          scripts/release-metadata.sh 1.20.1-0.1.0 | tee /tmp/stable-metadata.txt
+          grep -Fxq 'release_version=1.20.1-0.1.0' /tmp/stable-metadata.txt
+          grep -Fxq 'release_date=2026-10-02' /tmp/stable-metadata.txt
+          grep -Fxq 'release_type=release' /tmp/stable-metadata.txt
+          grep -Fxq 'github_prerelease=false' /tmp/stable-metadata.txt
+
+          scripts/extract-release-notes.sh 0.1.0 /tmp/release-notes.md
+          grep -Fq 'CI release-script test entry.' /tmp/release-notes.md
+
+      - name: Test prerelease metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release-fixture"
+
+          sed -i 's/^mod_version=.*/mod_version=0.1.0-rc.1/' gradle.properties
+          cat >> CHANGELOG.md <<'EOF'
+
+          ## [0.1.0-rc.1] - 2026-10-02
+
+          ### Added
+
+          - CI prerelease test entry.
+          EOF
+
+          scripts/release-metadata.sh 1.20.1-0.1.0-rc.1 | tee /tmp/prerelease-metadata.txt
+          grep -Fxq 'release_version=1.20.1-0.1.0-rc.1' /tmp/prerelease-metadata.txt
+          grep -Fxq 'release_type=beta' /tmp/prerelease-metadata.txt
+          grep -Fxq 'github_prerelease=true' /tmp/prerelease-metadata.txt
+
+      - name: Reject invalid SemVer
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release-fixture"
+
+          assert_semver_fails() {
+            local version="$1"
+            sed -i "s/^mod_version=.*/mod_version=$version/" gradle.properties
+            if scripts/release-metadata.sh "1.20.1-$version"; then
+              echo "::error::release-metadata.sh accepted invalid SemVer: $version"
+              exit 1
+            fi
+          }
+
+          assert_semver_fails '1.0.0-alpha..1'
+          assert_semver_fails '1.0.0-alpha.'
+          assert_semver_fails '1.0.0-01'
+          assert_semver_fails '1.0.0+foo..bar'
+          assert_semver_fails '01.0.0'
+          assert_semver_fails '1.00.0'
+          assert_semver_fails '1.0.00'
+
+      - name: Reject unsupported release channel
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release-fixture"
+
+          sed -i 's/^mod_version=.*/mod_version=0.1.0-preview.1/' gradle.properties
+          cat >> CHANGELOG.md <<'EOF'
+
+          ## [0.1.0-preview.1] - 2026-10-02
+
+          ### Added
+
+          - Invalid prerelease channel test entry.
+          EOF
+
+          if scripts/release-metadata.sh 1.20.1-0.1.0-preview.1; then
+            echo "::error::release-metadata.sh accepted an unsupported prerelease channel"
+            exit 1
+          fi
+
+      - name: Require exact CHANGELOG headings
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release-fixture"
+
+          sed -i 's/^mod_version=.*/mod_version=0.2.0/' gradle.properties
+          cat >> CHANGELOG.md <<'EOF'
+
+          ## [0.2.0] - 2026-10-02 extra text
+
+          - This heading must not be accepted.
+          EOF
+
+          if scripts/release-metadata.sh 1.20.1-0.2.0; then
+            echo "::error::release-metadata.sh accepted a non-exact CHANGELOG heading"
+            exit 1
+          fi
+
+          if scripts/extract-release-notes.sh 0.2.0 /tmp/non-exact-release-notes.md; then
+            echo "::error::extract-release-notes.sh accepted a non-exact CHANGELOG heading"
+            exit 1
+          fi
+
+      - name: Reject invalid and duplicate CHANGELOG dates
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release-fixture"
+
+          sed -i 's/^mod_version=.*/mod_version=0.3.0/' gradle.properties
+          cat >> CHANGELOG.md <<'EOF'
+
+          ## [0.3.0] - 2026-02-30
+
+          - Impossible calendar date.
+          EOF
+
+          if scripts/release-metadata.sh 1.20.1-0.3.0; then
+            echo "::error::release-metadata.sh accepted an impossible release date"
+            exit 1
+          fi
+
+          if scripts/extract-release-notes.sh 0.3.0 /tmp/invalid-date-notes.md; then
+            echo "::error::extract-release-notes.sh accepted an impossible release date"
+            exit 1
+          fi
+
+          sed -i 's/^mod_version=.*/mod_version=0.4.0/' gradle.properties
+          cat >> CHANGELOG.md <<'EOF'
+
+          ## [0.4.0] - 2026-10-01
+
+          - First duplicate.
+
+          ## [0.4.0] - 2026-10-02
+
+          - Second duplicate.
+          EOF
+
+          if scripts/release-metadata.sh 1.20.1-0.4.0; then
+            echo "::error::release-metadata.sh accepted duplicate CHANGELOG headings"
+            exit 1
+          fi
+
+          if scripts/extract-release-notes.sh 0.4.0 /tmp/duplicate-notes.md; then
+            echo "::error::extract-release-notes.sh accepted duplicate CHANGELOG headings"
+            exit 1
+          fi
+
+      - name: Test default-branch release guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$RUNNER_TEMP/release-branch-test"
+          rm -rf "$repo"
+          mkdir -p "$repo"
+          cd "$repo"
+
+          git init -q
+          git config user.name "CI"
+          git config user.email "ci@example.invalid"
+
+          echo base > file.txt
+          git add file.txt
+          git commit -qm base
+          git branch -M main
+          base_commit="$(git rev-parse HEAD)"
+
+          "$GITHUB_WORKSPACE/scripts/verify-release-branch.sh" "$base_commit" main
+
+          git switch -qc side
+          echo side >> file.txt
+          git add file.txt
+          git commit -qm side
+          side_commit="$(git rev-parse HEAD)"
+
+          if "$GITHUB_WORKSPACE/scripts/verify-release-branch.sh" "$side_commit" main; then
+            echo "::error::release branch guard accepted a commit outside the default branch"
+            exit 1
+          fi
