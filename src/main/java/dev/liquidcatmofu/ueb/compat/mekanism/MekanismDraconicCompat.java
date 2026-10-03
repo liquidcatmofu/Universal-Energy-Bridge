@@ -7,7 +7,6 @@ import dev.liquidcatmofu.ueb.api.FactoryCapabilityProvider;
 import dev.liquidcatmofu.ueb.compat.BlockEntityCompat;
 import dev.liquidcatmofu.ueb.compat.draconic.UniversalToOPStorage;
 import dev.liquidcatmofu.ueb.config.BridgeConfig;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 
@@ -26,7 +25,7 @@ public final class MekanismDraconicCompat implements BlockEntityCompat {
                 CapabilityOP.OP,
                 side -> new UniversalToOPStorage(new MekanismUniversalEnergyStorage(blockEntity, side)));
 
-        event.addCapability(new ResourceLocation(UniversalEnergyBridge.MOD_ID, "mekanism_draconic"), provider);
+        event.addCapability(UniversalEnergyBridge.id("mekanism_draconic"), provider);
         event.addListener(provider::invalidate);
     }
 }

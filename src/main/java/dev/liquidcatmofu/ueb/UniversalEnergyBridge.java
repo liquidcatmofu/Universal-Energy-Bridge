@@ -2,9 +2,10 @@ package dev.liquidcatmofu.ueb;
 
 import com.mojang.logging.LogUtils;
 import dev.liquidcatmofu.ueb.api.IUniversalEnergyStorage;
-import dev.liquidcatmofu.ueb.compat.CompatDispatcher;
 import dev.liquidcatmofu.ueb.command.UebCommands;
+import dev.liquidcatmofu.ueb.compat.CompatDispatcher;
 import dev.liquidcatmofu.ueb.config.BridgeConfig;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -17,6 +18,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+
+import java.util.Objects;
 
 @Mod(UniversalEnergyBridge.MOD_ID)
 public final class UniversalEnergyBridge {
@@ -32,6 +35,10 @@ public final class UniversalEnergyBridge {
 
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::attachCapabilities);
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
+    }
+
+    public static ResourceLocation id(String path) {
+        return Objects.requireNonNull(ResourceLocation.tryBuild(MOD_ID, path));
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
