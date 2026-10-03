@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.14] - 2026-10-04
+
+### Added
+
+- Optional Energy Meter 1.20.1 native high-throughput passthrough for BrandonsCore OP, Mekanism Strict Energy and Flux Networks long energy.
+- Energy Meter Consumer mode can consume and measure native high-throughput input without routing through Forge Energy.
+- Energy Meter Transfer mode preserves the incoming native protocol on outputs that expose the same capability, including UEB-provided native views on compatible endpoints.
+
+### Changed
+
+- Native Energy Meter transfers use the meter's existing IN/OUT/OFF configuration and keep multiple-output distribution without converting the transfer amount into a common signed-long representation first.
+- If an output does not expose the incoming native capability, the meter falls back to its Forge Energy view for that output.
+- High-energy Energy Meter short formatting now handles Exa, Zetta and Yotta FE and uses scientific notation beyond that range instead of indexing past the original Peta-only suffix table.
+- Native transfers feed the Energy Meter's existing measurement accumulator only after actual accepted energy is known; measurement conversion does not affect the transferred native value.
+
+
 ## [0.1.0-alpha.13] - 2026-10-04
 
 ### Added

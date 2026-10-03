@@ -12,6 +12,7 @@ public final class BridgeConfig {
     public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_APPLIED_FLUX;
     public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_DRACONIC;
     public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_APPLIED_FLUX;
+    public static final ForgeConfigSpec.BooleanValue ENERGY_METER_NATIVE_PASSTHROUGH;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -40,6 +41,11 @@ public final class BridgeConfig {
         MEKANISM_TO_APPLIED_FLUX = builder
                 .comment("Expose selected Mekanism endpoints directly as AppliedFlux FE external storage. Induction Matrix already has native AppliedFlux handling; this is mainly useful for Energy Cubes and Quantum Entangloporters.")
                 .define("mekanismToAppliedFlux", true);
+        ENERGY_METER_NATIVE_PASSTHROUGH = builder
+                .comment(
+                        "Expose Energy Meter inputs through native OP, Mekanism Strict Energy and Flux Networks long capabilities.",
+                        "Transfers keep the incoming native protocol when the output supports it and only fall back to Forge Energy when necessary.")
+                .define("energyMeterNativePassthrough", true);
         builder.pop();
 
         SPEC = builder.build();

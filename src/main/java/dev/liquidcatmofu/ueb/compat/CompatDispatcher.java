@@ -38,6 +38,14 @@ public final class CompatDispatcher {
         registerIfLoaded(new String[]{"mekanism", "draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismDraconicCompat");
 
+        // Energy Meter native protocol-preserving passthrough.
+        registerIfLoaded(new String[]{"energymeter", "draconicevolution"},
+                "dev.liquidcatmofu.ueb.compat.energymeter.EnergyMeterDraconicCompat");
+        registerIfLoaded(new String[]{"energymeter", "mekanism"},
+                "dev.liquidcatmofu.ueb.compat.energymeter.EnergyMeterMekanismCompat");
+        registerIfLoaded(new String[]{"energymeter", "fluxnetworks"},
+                "dev.liquidcatmofu.ueb.compat.energymeter.EnergyMeterFluxCompat");
+
         // AE2/AppliedFlux external storage views.
         registerIfLoaded(new String[]{"draconicevolution", "ae2", "appflux"},
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicAppliedFluxCompat");

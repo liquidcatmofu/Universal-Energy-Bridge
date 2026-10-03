@@ -8,7 +8,9 @@
     "flux.ServerFluxNetworkMixin",
     "mekanism.InventoryFrequencyMixin",
     "draconic.TileEnergyCoreExactIOMixin",
-    "draconic.OPStorageOPExactIOMixin"
+    "draconic.OPStorageOPExactIOMixin",
+    "energymeter.MeterEntityMeasurementMixin",
+    "energymeter.TextUtilsHighEnergyMixin"
   ],
   "client": [
     "draconic.EnergyCoreGuiExactIOMixin"
