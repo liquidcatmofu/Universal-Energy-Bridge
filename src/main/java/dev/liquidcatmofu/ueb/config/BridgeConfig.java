@@ -1,0 +1,39 @@
+package dev.liquidcatmofu.ueb.config;
+
+import net.minecraftforge.common.ForgeConfigSpec;
+
+public final class BridgeConfig {
+    public static final ForgeConfigSpec SPEC;
+
+    public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_MEKANISM;
+    public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_FLUX_NETWORKS;
+    public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_APPLIED_FLUX;
+    public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_DRACONIC;
+    public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_APPLIED_FLUX;
+
+    static {
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+
+        builder.push("compat");
+        DRACONIC_TO_MEKANISM = builder
+                .comment("Expose Draconic Evolution Energy Pylons through Mekanism Strict Energy without Forge Energy's int bottleneck.")
+                .define("draconicToMekanism", true);
+        DRACONIC_TO_FLUX_NETWORKS = builder
+                .comment("Expose Draconic Evolution Energy Pylons through Flux Networks long energy capability.")
+                .define("draconicToFluxNetworks", true);
+        DRACONIC_TO_APPLIED_FLUX = builder
+                .comment("Expose Draconic Evolution Energy Pylons as AppliedFlux FE external storage to AE2 storage buses.")
+                .define("draconicToAppliedFlux", true);
+        MEKANISM_TO_DRACONIC = builder
+                .comment("Expose selected Mekanism large-storage endpoints through BrandonsCore OP.")
+                .define("mekanismToDraconic", true);
+        MEKANISM_TO_APPLIED_FLUX = builder
+                .comment("Expose selected Mekanism endpoints directly as AppliedFlux FE external storage. Induction Matrix already has native AppliedFlux handling; this is mainly useful for Quantum Entangloporters.")
+                .define("mekanismToAppliedFlux", true);
+        builder.pop();
+
+        SPEC = builder.build();
+    }
+
+    private BridgeConfig() {}
+}
