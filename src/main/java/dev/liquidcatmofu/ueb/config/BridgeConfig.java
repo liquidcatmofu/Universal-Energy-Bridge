@@ -8,6 +8,7 @@ public final class BridgeConfig {
     public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_MEKANISM;
     public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_FLUX_NETWORKS;
     public static final ForgeConfigSpec.BooleanValue FLUX_NETWORKS_TO_DRACONIC;
+    public static final ForgeConfigSpec.BooleanValue FLUX_NETWORKS_OVERFLOW_GUARD;
     public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_APPLIED_FLUX;
     public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_DRACONIC;
     public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_APPLIED_FLUX;
@@ -25,6 +26,11 @@ public final class BridgeConfig {
         FLUX_NETWORKS_TO_DRACONIC = builder
                 .comment("Expose Flux Plugs through BrandonsCore OP so actively-pushing Draconic devices can use Flux Networks' long receive path instead of Forge Energy.")
                 .define("fluxNetworksToDraconic", true);
+        FLUX_NETWORKS_OVERFLOW_GUARD = builder
+                .comment(
+                        "Patch Flux Networks 1.20 statistics/request aggregation so signed-long sums saturate instead of wrapping negative.",
+                        "This does not lower the per-transfer limit; it only guards aggregate bookkeeping.")
+                .define("fluxNetworksOverflowGuard", true);
         DRACONIC_TO_APPLIED_FLUX = builder
                 .comment("Expose Draconic Evolution Energy Pylons as AppliedFlux FE external storage to AE2 storage buses.")
                 .define("draconicToAppliedFlux", true);
