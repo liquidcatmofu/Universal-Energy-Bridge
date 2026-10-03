@@ -1,52 +1,41 @@
-# Minecraft 1.20.1 Forge Mod Template
+# Universal Energy Bridge
 
-Minecraft Forge 1.20.1向けの小規模MODを素早く作るためのリポジトリテンプレートです。
+Minecraft 1.20.1 Forge向けの試作互換MODです。Forge Energyの`int`転送APIへフォールバックせず、各MODが持つlong/nativeエネルギーAPI同士を接続します。
 
-## 基本構成
+現在の試作対応:
 
-- Minecraft 1.20.1
-- Forge 47.4.10
-- ForgeGradle 6.0.54
-- Gradle Wrapper 8.14
-- Gradle実行JDK 21
-- Java target 17
-- Official Mojang mappings
-- MixinGradle 0.7.38 / SpongePowered Mixinを標準で有効化
-- CI、およびタグ起点のGitHub Release / Modrinth / CurseForge公開
+- Draconic Evolution Energy Pylon → Universal Energy Capability
+- Draconic Evolution Energy Pylon ↔ Mekanism Strict Energy
+- Draconic Evolution Energy Pylon ↔ Flux Networks long energy
+- Draconic Evolution Energy Pylon ↔ AppliedFlux/AE2 外部FEストレージ
+- Mekanism Induction Port / Quantum Entangloporter → Universal Energy Capability
+- Mekanism Induction Port / Quantum Entangloporter ↔ BrandonsCore OP
+- Quantum Entangloporter ↔ AppliedFlux/AE2 外部FEストレージ
 
-## MODを作る
+Induction MatrixについてはAppliedFlux自身に直接統合があるため、このMODでは置き換えません。
 
-GitHub Templateからリポジトリを作成した後、次を実行します。
+## ビルド
 
-```bash
-./init.sh <mod_id> "<Mod Name>" <java.package>
-```
-
-例:
-
-```bash
-./init.sh example_tools "Example Tools" dev.liquidcatmofu.exampletools
-./init.sh benri_tools "便利ツール" dev.liquidcatmofu.benritools
-```
-
-表示名にASCII英数字が含まれる場合はそこからMain class名を生成します。表示名が日本語などの非ASCII文字だけの場合は`mod_id`へfallbackし、例えば`benri_tools`から`BenriTools`を生成します。
-
-初期化スクリプトはGradle/MODメタデータ、Java package、Main class、Mixin設定、ドキュメント雛形、成果物名を更新し、最後にテンプレート専用ファイルと自身を削除します。
-
-初期化後は次でビルドできます。
+リポジトリに入っているGradle Wrapperを使います。system Gradleでwrapperを作り直す必要はありません。
 
 ```bash
 ./gradlew clean build
 ```
 
-上の例では公開JARは次の形式になります。
+Minecraft側のtargetはJava 17です。GitHub Actionsでも同じコマンドを実行します。
+
+## Probe
+
+OP権限で以下を実行できます。
 
 ```text
-ExampleTools-Forge-1.20.1-0.1.0.jar
+/ueb probe <x> <y> <z>
 ```
 
-リリースタグは`MinecraftVersion-SemVer`形式（例: `1.20.1-0.1.0`）です。詳細は[リリース手順](docs/releasing.md)を参照してください。
+Universal Energyの保存量/容量と、`Long.MAX_VALUE`を使ったsimulate入出力量を表示します。`Integer.MAX_VALUE`で不意にclampされていないか確認する用途です。
 
-## 初回リリース前
+境界値テストは`TESTPLAN.md`を参照してください。
 
-`gradle.properties`の`mod_description`、`mod_license`、`publish_environment`を実際のMODに合わせ、生成されたREADME/CHANGELOGを更新し、`docs/releasing.md`記載の公開用variables/secretsを設定してください。
+## 現状
+
+初期試作です。QE buffer override、GTCEu、BigIntegerによる正確な超long容量表示は、まず基本のlong経路をゲーム内で確認してから追加します。
