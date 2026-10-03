@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.6] - 2026-10-03
+
+### Added
+
+- Optional Flux Networks overflow guard, enabled by default.
+- Overflow-safe Flux Networks statistics aggregation without changing high-throughput transfer limits.
+- Saturating Flux Networks network request/buffer limiter aggregation.
+
+### Fixed
+
+- Prevent Flux Networks input/output statistics from wrapping negative when long-capability sources such as Mekanism Creative Energy Cubes exceed the intermediate accumulator range.
+- Prevent Flux Networks' network buffer limiter from wrapping negative when aggregate requests exceed signed-long range.
+
 ## [0.1.0-alpha.5] - 2026-10-03
 
 ### Added
