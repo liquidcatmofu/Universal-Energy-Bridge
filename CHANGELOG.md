@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.11] - 2026-10-03
+
+### Added
+
+- Optional server-side Quantum Entangloporter unlimited energy-buffer override.
+- When enabled, only the shared QE frequency energy container uses Mekanism `FloatingLong.MAX_VALUE`; other Mekanism energy storage and the original Mekanism config are unchanged.
+- The option is intentionally disabled by default and requires a world/server restart.
+
 ## [0.1.0-alpha.10] - 2026-10-03
 
 ### Changed

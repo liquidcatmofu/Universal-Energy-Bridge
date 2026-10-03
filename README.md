@@ -2,21 +2,24 @@
 
 Prototype compatibility mod for Minecraft 1.20.1 Forge that keeps high-throughput energy transfers on long/native APIs instead of falling back to Forge Energy's `int` transfer methods.
 
-Current prototype integrations:
+Current prototype integrations include Draconic Evolution, Mekanism, Flux Networks, AppliedFlux/AE2 and Jade.
 
-- Draconic Evolution Energy Pylon → Universal Energy capability
-- Draconic Evolution Energy Pylon ↔ Mekanism Strict Energy
-- Draconic Evolution Energy Pylon ↔ Flux Networks long energy
-- Draconic Evolution Energy Pylon ↔ AppliedFlux/AE2 external FE storage
-- Mekanism Induction Port / Quantum Entangloporter → Universal Energy capability
-- Mekanism Induction Port / Quantum Entangloporter ↔ BrandonsCore OP
-- Quantum Entangloporter ↔ AppliedFlux/AE2 external FE storage
+## Quantum Entangloporter unlimited buffer
 
-AppliedFlux already has a direct Induction Matrix integration, so this mod does not replace it.
+alpha.11 adds an opt-in server/world setting that ignores Mekanism's QE frequency `energyBuffer` limit without changing the original Mekanism config or any other Mekanism energy container.
+
+In the world's `serverconfig/universal_energy_bridge-server.toml`:
+
+```toml
+[mekanism]
+quantumEntangloporterUnlimitedEnergyBuffer = true
+```
+
+Restart the world/server after changing this option. When enabled, the shared QE frequency energy buffer uses Mekanism's native `FloatingLong.MAX_VALUE`. With the default Mekanism Forge Energy conversion rate, that is roughly 7.38 EFE of FE-equivalent capacity/maximum transfer per tick per frequency.
 
 ## Build
 
-Use the checked-in Gradle wrapper. Do not run the system Gradle to generate another wrapper.
+Use the checked-in Gradle wrapper.
 
 ```bash
 ./gradlew clean build
@@ -35,7 +38,3 @@ With operator permission:
 This reports the Universal Energy view and simulates insertion/extraction with `Long.MAX_VALUE`, which is useful for spotting accidental `Integer.MAX_VALUE` clamps.
 
 See `TESTPLAN.md` for boundary tests.
-
-## Status
-
-This is an early prototype. QE buffer override, GTCEu and optional exact/BigInteger capacity reporting are intentionally deferred until the core long paths are verified in-game.
