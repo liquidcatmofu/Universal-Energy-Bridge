@@ -64,3 +64,10 @@ mandatory=false
 versionRange="[0,)"
 ordering="AFTER"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="energymeter"
+mandatory=false
+versionRange="[0,)"
+ordering="AFTER"
+side="BOTH"
