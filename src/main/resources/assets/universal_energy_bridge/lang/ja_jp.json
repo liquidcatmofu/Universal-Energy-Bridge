@@ -1,0 +1,13 @@
+{
+  "jade.universal_energy_bridge.flux.type": "種類: %s",
+  "jade.universal_energy_bridge.flux.network": "ネットワーク: %s",
+  "jade.universal_energy_bridge.flux.priority": "優先度: %s",
+  "jade.universal_energy_bridge.flux.surge_on": "Power Surge: ON (Very High)",
+  "jade.universal_energy_bridge.flux.surge_off": "Power Surge: OFF",
+  "jade.universal_energy_bridge.flux.limit": "上限: %s",
+  "jade.universal_energy_bridge.flux.transfer": "直近の転送: %s",
+  "jade.universal_energy_bridge.flux.bypass": "上限バイパス: %s",
+  "jade.universal_energy_bridge.flux.chunk_loading": "チャンクローディング: %s",
+  "jade.universal_energy_bridge.common.on": "ON",
+  "jade.universal_energy_bridge.common.off": "OFF"
+}

@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.9] - 2026-10-03
+
+### Added
+
+- Flux Networks custom device names replace the default Jade object title even without show-details/sneak mode.
+- Sneak/show-details diagnostics for Flux devices: device type, network name, raw priority, Power Surge, configured limit and last transfer.
+- Bypass Limit and Chunk Loading status are shown in Jade only to FN access levels that can edit the network/device.
+- Flux diagnostic data is sent only to players who can use the network; blocked players still only receive the public custom device name.
+
 ## [0.1.0-alpha.8] - 2026-10-03
 
 ### Added
