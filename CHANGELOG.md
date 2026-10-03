@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.6] - 2026-10-03
+
+### Added
+
+- Optional Flux Networks overflow guard, enabled by default.
+- Saturating aggregation for Flux Networks network statistics at extreme native-long throughput.
+- Saturating recomputation of Flux Networks' network-wide request limiter so an aggregate above `Long.MAX_VALUE` cannot wrap negative and feed back into Flux Plug receive logic.
+
+### Changed
+
+- Extreme Flux Networks statistics now clamp to signed-long bounds rather than displaying wrapped negative values. Individual device transfer limits are not reduced.
+
 ## [0.1.0-alpha.5] - 2026-10-03
 
 ### Added

@@ -1,0 +1,14 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "dev.liquidcatmofu.ueb.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "dev.liquidcatmofu.ueb.mixin.UebMixinPlugin",
+  "mixins": [
+    "flux.NetworkStatisticsMixin",
+    "flux.ServerFluxNetworkMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

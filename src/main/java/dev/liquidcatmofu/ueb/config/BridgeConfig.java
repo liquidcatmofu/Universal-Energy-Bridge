@@ -11,6 +11,7 @@ public final class BridgeConfig {
     public static final ForgeConfigSpec.BooleanValue DRACONIC_TO_APPLIED_FLUX;
     public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_DRACONIC;
     public static final ForgeConfigSpec.BooleanValue MEKANISM_TO_APPLIED_FLUX;
+    public static final ForgeConfigSpec.BooleanValue FLUX_NETWORKS_OVERFLOW_GUARD;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -34,6 +35,12 @@ public final class BridgeConfig {
         MEKANISM_TO_APPLIED_FLUX = builder
                 .comment("Expose selected Mekanism endpoints directly as AppliedFlux FE external storage. Induction Matrix already has native AppliedFlux handling; this is mainly useful for Energy Cubes and Quantum Entangloporters.")
                 .define("mekanismToAppliedFlux", true);
+        FLUX_NETWORKS_OVERFLOW_GUARD = builder
+                .comment(
+                        "Patch Flux Networks' network-wide long accumulators to saturate instead of wrapping negative.",
+                        "This does not lower per-device transfer limits. It only guards statistics and the internal request limiter."
+                )
+                .define("fluxNetworksOverflowGuard", true);
         builder.pop();
 
         SPEC = builder.build();
