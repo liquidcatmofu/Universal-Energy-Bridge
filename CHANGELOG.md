@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.12] - 2026-10-03
+
+### Added
+
+- Exact BigInteger I/O tracking for Draconic Evolution Energy Cores.
+- The Energy Core GUI now displays aggregate input/output above signed-long range instead of relying on BrandonsCore IOTracker's long-limited average.
+- Exact tracking runs alongside the original DE tracker and does not alter actual energy transfer or storage.
+
+### Changed
+
+- Energy Core I/O keeps the original GUI behavior: normal view shows exact net I/O, while holding Shift shows exact input and output separately.
+- The exact tracker mirrors BrandonsCore's 19-completed-tick averaging window but performs accumulation and averaging with BigInteger.
+
 ## [0.1.0-alpha.11] - 2026-10-03
 
 ### Added
