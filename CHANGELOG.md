@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.4] - 2026-10-03
+
+### Added
+
+- Expose Flux Plugs through BrandonsCore OP backed by Flux Networks' signed-long energy capability.
+- Expose the Draconic Evolution Creative Power Source through Flux Networks' signed-long energy capability.
+
+### Fixed
+
+- Avoid the Forge Energy / Integer.MAX_VALUE fallback when a Draconic Creative Power Source actively pushes into a Flux Plug.
+
 ## [0.1.0-alpha.3] - 2026-10-03
 
 ### Added

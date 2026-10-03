@@ -31,6 +31,8 @@ public final class CompatDispatcher {
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicMekanismCompat");
         registerIfLoaded(new String[]{"draconicevolution", "fluxnetworks"},
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicFluxCompat");
+        registerIfLoaded(new String[]{"fluxnetworks", "draconicevolution"},
+                "dev.liquidcatmofu.ueb.compat.flux.FluxDraconicCompat");
         registerIfLoaded(new String[]{"mekanism", "draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismDraconicCompat");
 
