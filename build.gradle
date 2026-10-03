@@ -3,7 +3,6 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '6.0.54'
-    id 'org.spongepowered.mixin' version '0.7.38'
 }
 
 group = maven_group
@@ -20,6 +19,7 @@ java {
 
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
+    copyIdeResources = true
 
     runs {
         configureEach {
@@ -36,14 +36,29 @@ minecraft {
     }
 }
 
-dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+repositories {
+    mavenCentral()
+    maven { url = 'https://cursemaven.com' }
+    maven { url = 'https://maven.covers1624.net/' }
+    maven { url = 'https://chickenbones.net/maven/' }
+    maven { url = 'https://maven.blamejared.com/' }
+    maven { url = 'https://dvs1.progwml6.com/files/maven/' }
+    maven { url = 'https://modmaven.dev/' }
 }
 
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
-    config "${mod_id}.mixins.json"
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // Optional integrations. These are compile-only; users only need the mods they actually bridge.
+    compileOnly fg.deobf('curse.maven:flux-networks-248020:5234697')
+    compileOnly fg.deobf('com.brandon3055.brandonscore:BrandonsCore:1.20.1-3.2.1.+:universal')
+    compileOnly fg.deobf('io.codechicken:CodeChickenLib:1.20.1-4.4.0.+:universal')
+    compileOnly fg.deobf('curse.maven:draconic-evolution-223565:6793843')
+    compileOnly fg.deobf('curse.maven:mekanism-268560:6552911')
+    compileOnly fg.deobf('curse.maven:applied-energistics-2-223794:6357138')
+    compileOnly 'org.appliedenergistics:guideme:20.1.14'
+    compileOnly fg.deobf('curse.maven:applied-flux-965012:7651647')
+    compileOnly fg.deobf('curse.maven:glodium-957920:5226922')
 }
 
 def tomlEscape = { value ->
@@ -85,13 +100,12 @@ tasks.withType(JavaCompile).configureEach {
 tasks.named('jar', Jar).configure {
     manifest {
         attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1',
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                'MixinConfigs'            : "${mod_id}.mixins.json"
+                'Specification-Title'      : mod_id,
+                'Specification-Vendor'     : mod_authors,
+                'Specification-Version'    : '1',
+                'Implementation-Title'     : project.name,
+                'Implementation-Version'   : project.jar.archiveVersion,
+                'Implementation-Vendor'    : mod_authors
         ])
     }
     finalizedBy 'reobfJar'
