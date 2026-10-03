@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.15] - 2026-10-04
+
+### Fixed
+
+- Prevent Energy Meter's `getTransferRate()` three-decimal rounding from saturating through `Math.round(double)` at `Long.MAX_VALUE`, which capped displayed native transfer rates at about 9.22 PFE/t.
+- High native rates now keep the meter's existing `double` measurement value once three-decimal rounding is no longer representable as a signed `long`; lower rates retain Energy Meter's original rounding behavior.
+
 ## [0.1.0-alpha.14] - 2026-10-04
 
 ### Added
