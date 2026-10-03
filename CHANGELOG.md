@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.10] - 2026-10-03
+
+### Changed
+
+- Flux Jade Network and Last Transfer lines are now shown whenever the player can use the network, without requiring sneak/show-details.
+- Flux network names in Jade use the network's configured Flux Networks color.
+- Last Transfer is colored green for positive transfer, red for negative transfer and gold for zero.
+
+### Kept in show-details mode
+
+- Device type, priority, Power Surge and configured limit.
+- Bypass Limit and Chunk Loading for access levels that can edit.
+
 ## [0.1.0-alpha.9] - 2026-10-03
 
 ### Added

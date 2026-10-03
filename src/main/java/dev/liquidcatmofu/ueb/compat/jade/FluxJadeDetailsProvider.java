@@ -4,6 +4,8 @@ import dev.liquidcatmofu.ueb.UniversalEnergyBridge;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -13,7 +15,7 @@ import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.IDisplayHelper;
 
 /**
- * Sneak/show-details diagnostics for Flux Networks devices.
+ * Always-visible Flux summary plus sneak/show-details diagnostics.
  */
 public enum FluxJadeDetailsProvider implements IBlockComponentProvider {
     INSTANCE;
@@ -23,6 +25,13 @@ public enum FluxJadeDetailsProvider implements IBlockComponentProvider {
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         CompoundTag root = accessor.getServerData().getCompound(FluxJadeServerDataProvider.ROOT);
+        if (root.isEmpty()) {
+            return;
+        }
+
+        addNetworkSummary(tooltip, root);
+        addTransferSummary(tooltip, root);
+
         if (!root.contains(FluxJadeServerDataProvider.DETAILS)) {
             return;
         }
@@ -32,12 +41,6 @@ public enum FluxJadeDetailsProvider implements IBlockComponentProvider {
         Component type = Component.Serializer.fromJson(details.getString(FluxJadeServerDataProvider.TYPE));
         if (type != null) {
             tooltip.add(Component.translatable("jade.universal_energy_bridge.flux.type", type)
-                    .withStyle(ChatFormatting.GRAY));
-        }
-
-        String network = details.getString(FluxJadeServerDataProvider.NETWORK);
-        if (!network.isEmpty()) {
-            tooltip.add(Component.translatable("jade.universal_energy_bridge.flux.network", network)
                     .withStyle(ChatFormatting.GRAY));
         }
 
@@ -58,12 +61,6 @@ public enum FluxJadeDetailsProvider implements IBlockComponentProvider {
         tooltip.add(Component.translatable("jade.universal_energy_bridge.flux.limit", formattedLimit)
                 .withStyle(ChatFormatting.GRAY));
 
-        long transfer = details.getLong(FluxJadeServerDataProvider.TRANSFER);
-        tooltip.add(Component.translatable(
-                        "jade.universal_energy_bridge.flux.transfer",
-                        formatSignedRate(transfer))
-                .withStyle(ChatFormatting.GRAY));
-
         if (details.getBoolean(FluxJadeServerDataProvider.CAN_EDIT)) {
             boolean bypass = details.getBoolean(FluxJadeServerDataProvider.BYPASS);
             boolean chunkLoading = details.getBoolean(FluxJadeServerDataProvider.CHUNK_LOADING);
@@ -76,6 +73,40 @@ public enum FluxJadeDetailsProvider implements IBlockComponentProvider {
                             localizedOnOff(chunkLoading))
                     .withStyle(chunkLoading ? ChatFormatting.YELLOW : ChatFormatting.GRAY));
         }
+    }
+
+    private static void addNetworkSummary(ITooltip tooltip, CompoundTag root) {
+        String network = root.getString(FluxJadeServerDataProvider.NETWORK);
+        if (network.isEmpty()) {
+            return;
+        }
+
+        int rgb = root.getInt(FluxJadeServerDataProvider.NETWORK_COLOR) & 0xFFFFFF;
+        Component coloredName = Component.literal(network)
+                .withStyle(Style.EMPTY.withColor(TextColor.fromRgb(rgb)));
+
+        tooltip.add(Component.translatable(
+                        "jade.universal_energy_bridge.flux.network",
+                        coloredName)
+                .withStyle(ChatFormatting.GRAY));
+    }
+
+    private static void addTransferSummary(ITooltip tooltip, CompoundTag root) {
+        if (!root.contains(FluxJadeServerDataProvider.TRANSFER)) {
+            return;
+        }
+
+        long transfer = root.getLong(FluxJadeServerDataProvider.TRANSFER);
+        ChatFormatting color = transfer > 0
+                ? ChatFormatting.GREEN
+                : transfer < 0
+                ? ChatFormatting.RED
+                : ChatFormatting.GOLD;
+
+        tooltip.add(Component.translatable(
+                        "jade.universal_energy_bridge.flux.transfer",
+                        formatSignedRate(transfer))
+                .withStyle(color));
     }
 
     private static String formatSignedRate(long value) {
@@ -100,7 +131,7 @@ public enum FluxJadeDetailsProvider implements IBlockComponentProvider {
 
     @Override
     public int getDefaultPriority() {
-        // Put diagnostics below the energy bar rather than crowding the title.
+        // Keep the summary/details immediately below the energy bar.
         return TooltipPosition.BODY + 200;
     }
 }
