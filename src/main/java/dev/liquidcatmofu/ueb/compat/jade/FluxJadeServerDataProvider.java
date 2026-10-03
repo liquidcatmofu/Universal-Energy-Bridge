@@ -11,25 +11,27 @@ import sonar.fluxnetworks.common.connection.FluxNetwork;
 import sonar.fluxnetworks.common.device.TileFluxDevice;
 
 /**
- * Sends Flux device metadata only when Jade needs it.
+ * Sends Flux device metadata to Jade.
  *
- * <p>The custom device name is always sent. Diagnostic data is only sent while
- * Jade is in show-details mode (normally sneak) and only to players who can use
- * the network. Edit-only flags are restricted to FN access levels that can edit.</p>
+ * <p>The custom device name is always public. Network/transfer summary is sent only
+ * to players who can use the network. Extended diagnostic data is sent only in
+ * show-details mode (normally sneak). Edit-only flags remain restricted to access
+ * levels that can edit the network/device.</p>
  */
 public enum FluxJadeServerDataProvider implements IServerDataProvider<BlockAccessor> {
     INSTANCE;
 
     static final String ROOT = "UEBFlux";
     static final String CUSTOM_NAME = "CustomName";
+    static final String NETWORK = "Network";
+    static final String NETWORK_COLOR = "NetworkColor";
+    static final String TRANSFER = "Transfer";
     static final String DETAILS = "Details";
     static final String TYPE = "Type";
-    static final String NETWORK = "Network";
     static final String PRIORITY = "Priority";
     static final String SURGE = "Surge";
     static final String LIMIT = "Limit";
     static final String BYPASS = "Bypass";
-    static final String TRANSFER = "Transfer";
     static final String CAN_EDIT = "CanEdit";
     static final String CHUNK_LOADING = "ChunkLoading";
 
@@ -42,28 +44,33 @@ public enum FluxJadeServerDataProvider implements IServerDataProvider<BlockAcces
         }
 
         CompoundTag root = new CompoundTag();
+
         String customName = device.getCustomName();
         if (!customName.isEmpty()) {
             root.putString(CUSTOM_NAME, customName);
         }
 
-        if (accessor.showDetails()) {
-            FluxNetwork network = device.getNetwork();
-            if (network.isValid()) {
-                AccessLevel access = network.getPlayerAccess(accessor.getPlayer());
-                if (access.canUse()) {
+        FluxNetwork network = device.getNetwork();
+        if (network.isValid()) {
+            AccessLevel access = network.getPlayerAccess(accessor.getPlayer());
+            if (access.canUse()) {
+                root.putString(NETWORK, network.getNetworkName());
+                root.putInt(NETWORK_COLOR, network.getNetworkColor());
+                root.putLong(TRANSFER, device.getTransferChange());
+
+                if (accessor.showDetails()) {
                     CompoundTag details = new CompoundTag();
                     details.putString(TYPE, Component.Serializer.toJson(device.getDisplayStack().getHoverName()));
-                    details.putString(NETWORK, network.getNetworkName());
                     details.putInt(PRIORITY, device.getRawPriority());
                     details.putBoolean(SURGE, device.getSurgeMode());
                     details.putLong(LIMIT, device.getRawLimit());
-                    details.putLong(TRANSFER, device.getTransferChange());
                     details.putBoolean(CAN_EDIT, access.canEdit());
+
                     if (access.canEdit()) {
                         details.putBoolean(BYPASS, device.getDisableLimit());
                         details.putBoolean(CHUNK_LOADING, device.isForcedLoading());
                     }
+
                     root.put(DETAILS, details);
                 }
             }
