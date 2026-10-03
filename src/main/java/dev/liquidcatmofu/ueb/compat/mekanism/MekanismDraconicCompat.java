@@ -17,10 +17,13 @@ public final class MekanismDraconicCompat implements BlockEntityCompat {
             return;
         }
         BlockEntity blockEntity = event.getObject();
-        if (!MekanismCompatTargets.isLargeEnergyEndpoint(blockEntity)) {
+        if (!MekanismCompatTargets.isDraconicEndpoint(blockEntity)) {
             return;
         }
 
+        // Resolve the native Strict Energy capability on every operation. This is
+        // especially important for Universal Cables because their sided handler changes
+        // behavior as NORMAL/PULL/PUSH/NONE and redstone state change.
         FactoryCapabilityProvider<IOPStorage> provider = new FactoryCapabilityProvider<>(
                 CapabilityOP.OP,
                 side -> new UniversalToOPStorage(new MekanismUniversalEnergyStorage(blockEntity, side)));
