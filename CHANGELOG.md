@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.8] - 2026-10-03
+
+### Added
+
+- Expose Flux Plug and Flux Point through UEB Universal Energy using Flux Networks' signed-long capability.
+- Jade tooltip override for UEB-backed non-Mekanism blocks, restoring Jade's standard energy bar after Mekanism's Jade integration removes it.
+
+### Fixed
+
+- Draconic Energy Pylons no longer keep Mekanism's Jade energy presentation merely because UEB exposes Mekanism Strict Energy on them.
+- Flux Plugs can now report their signed-long buffer/limit to Jade instead of the Forge Energy 2,147,483,647 ceiling.
+- Replace deprecated direct ResourceLocation construction with the 1.20.1 static factory helper.
+
 ## [0.1.0-alpha.7] - 2026-10-03
 
 ### Added

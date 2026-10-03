@@ -25,6 +25,8 @@ public final class CompatDispatcher {
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicUniversalCompat");
         registerIfLoaded(new String[]{"mekanism"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismUniversalCompat");
+        registerIfLoaded(new String[]{"fluxnetworks"},
+                "dev.liquidcatmofu.ueb.compat.flux.FluxUniversalCompat");
 
         // Native high-throughput views.
         registerIfLoaded(new String[]{"draconicevolution", "mekanism"},

@@ -9,7 +9,6 @@ import dev.liquidcatmofu.ueb.config.BridgeConfig;
 import mekanism.common.tile.TileEntityEnergyCube;
 import mekanism.common.tile.TileEntityQuantumEntangloporter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 
@@ -40,7 +39,7 @@ public final class MekanismAppliedFluxCompat implements BlockEntityCompat {
                         new MekanismUniversalEnergyStorage(blockEntity, side),
                         description));
 
-        event.addCapability(new ResourceLocation(UniversalEnergyBridge.MOD_ID, "mekanism_applied_flux"), provider);
+        event.addCapability(UniversalEnergyBridge.id("mekanism_applied_flux"), provider);
         event.addListener(provider::invalidate);
     }
 }
