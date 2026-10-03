@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.5] - 2026-10-03
+
+### Added
+
+- Recognize Mekanism Extras reinforced induction ports and extra energy cubes as native Mekanism Strict Energy endpoints.
+- Expose Mekanism Extras large energy endpoints through Universal Energy, BrandonsCore OP and AppliedFlux external storage without a direct compile dependency on Mekanism Extras.
+
+### Fixed
+
+- Resolve Mekanism Strict Energy dynamically on every operation instead of permanently caching the first side capability result. This prevents vanilla Induction Matrix ports from getting stuck on Forge Energy after multiblock formation/reformation or side-mode changes.
+
 ## [0.1.0-alpha.4] - 2026-10-03
 
 ### Added
