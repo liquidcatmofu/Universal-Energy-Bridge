@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.7] - 2026-10-03
+
+### Added
+
+- Optional Jade integration that reports UEB Universal Energy storage using Jade's native energy bar with signed-long values.
+- Expose the Draconic Evolution Creative Power Source through Universal Energy so Jade and future UEB consumers can avoid Forge Energy's int-limited view.
+
+### Fixed
+
+- Jade no longer falls back to the 2,147,483,647 FE Forge Energy display limit for UEB-backed energy endpoints such as Draconic Energy Pylons and Mekanism Energy Cubes.
+
 ## [0.1.0-alpha.6] - 2026-10-03
 
 ### Added

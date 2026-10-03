@@ -59,6 +59,9 @@ dependencies {
     compileOnly 'org.appliedenergistics:guideme:20.1.14'
     compileOnly fg.deobf('curse.maven:applied-flux-965012:7651647')
     compileOnly fg.deobf('curse.maven:glodium-957920:5226922')
+
+    // Jade 1.20.1 API is bundled in the normal jar. Compile-only keeps Jade optional at runtime.
+    compileOnly fg.deobf('curse.maven:jade-324717:8479276')
 }
 
 def tomlEscape = { value ->

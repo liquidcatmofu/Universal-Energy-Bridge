@@ -1,5 +1,6 @@
 package dev.liquidcatmofu.ueb.compat.draconic;
 
+import com.brandon3055.draconicevolution.blocks.tileentity.TileCreativeOPCapacitor;
 import com.brandon3055.draconicevolution.blocks.tileentity.TileEnergyPylon;
 import dev.liquidcatmofu.ueb.api.CapabilityAttachUtil;
 import dev.liquidcatmofu.ueb.api.UniversalEnergyCapabilities;
@@ -14,6 +15,10 @@ public final class DraconicUniversalCompat implements BlockEntityCompat {
             CapabilityAttachUtil.add(event, "draconic_universal",
                     UniversalEnergyCapabilities.ENERGY,
                     new DraconicUniversalEnergyStorage(pylon));
+        } else if (event.getObject() instanceof TileCreativeOPCapacitor source) {
+            CapabilityAttachUtil.addSided(event, "draconic_creative_universal",
+                    UniversalEnergyCapabilities.ENERGY,
+                    side -> new DraconicCapabilityEnergyStorage(source, side));
         }
     }
 }
