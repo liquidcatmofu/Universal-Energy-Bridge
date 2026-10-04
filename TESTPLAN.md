@@ -7,8 +7,10 @@ Run `/ueb probe <pos>` on:
 - Draconic Energy Pylon
 - Mekanism Induction Port
 - Mekanism Quantum Entangloporter
+- Trash Cans Energy Trash Can
+- Trash Cans Ultimate Trash Can
 
-Expected: all three report a Universal Energy capability.
+Expected: all five report a Universal Energy capability.
 
 ## B. Integer boundary
 
@@ -65,3 +67,21 @@ Then deliberately connect the same physical storage through multiple networks (f
 - repeated zero-net-flow transfers
 
 Disable individual compat paths in the UEB config to isolate any loop.
+
+
+## G. Trash Cans long sink
+
+1. Place an Energy Trash Can or Ultimate Trash Can.
+2. Disable its energy transfer limit.
+3. Run `/ueb probe <pos>`.
+
+Expected with the limit disabled:
+
+- simulated Universal insertion with `Long.MAX_VALUE` returns `Long.MAX_VALUE`
+- extraction returns 0
+- stored energy is 0
+- capacity is `Long.MAX_VALUE`
+
+Then enable the Trash Cans transfer limit and set it to 10,000,000 FE/t.
+
+Expected: simulated Universal insertion is capped at 10,000,000, preserving the Trash Cans setting instead of bypassing it.

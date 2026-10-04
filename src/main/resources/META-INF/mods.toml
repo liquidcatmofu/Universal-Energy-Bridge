@@ -71,3 +71,10 @@ mandatory=false
 versionRange="[0,)"
 ordering="AFTER"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="trashcans"
+mandatory=false
+versionRange="[0,)"
+ordering="AFTER"
+side="BOTH"

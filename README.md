@@ -2,7 +2,7 @@
 
 Prototype compatibility mod for Minecraft 1.20.1 Forge that keeps high-throughput energy transfers on long/native APIs instead of falling back to Forge Energy's `int` transfer methods.
 
-Current prototype integrations include Draconic Evolution, Mekanism, Flux Networks, AppliedFlux/AE2 and Jade.
+Current prototype integrations include Draconic Evolution, Mekanism, Flux Networks, AppliedFlux/AE2, Trash Cans and Jade.
 
 ## Quantum Entangloporter unlimited buffer
 

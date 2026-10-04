@@ -2,7 +2,7 @@
 
 Minecraft 1.20.1 Forge向けの試作互換MODです。Forge Energyの`int`転送APIへフォールバックせず、各MODが持つlong/nativeエネルギーAPI同士を接続します。
 
-現在はDraconic Evolution、Mekanism、Flux Networks、AppliedFlux/AE2、Jadeとの互換を試作しています。
+現在はDraconic Evolution、Mekanism、Flux Networks、AppliedFlux/AE2、Trash Cans、Jadeとの互換を試作しています。
 
 ## Quantum Entangloporterのバッファ上限無視
 
