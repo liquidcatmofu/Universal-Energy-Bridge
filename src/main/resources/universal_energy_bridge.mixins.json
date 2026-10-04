@@ -10,7 +10,8 @@
     "draconic.TileEnergyCoreExactIOMixin",
     "draconic.OPStorageOPExactIOMixin",
     "energymeter.MeterEntityMeasurementMixin",
-    "energymeter.TextUtilsHighEnergyMixin"
+    "energymeter.TextUtilsHighEnergyMixin",
+    "trashcans.TrashCanCapabilityFallbackMixin"
   ],
   "client": [
     "draconic.EnergyCoreGuiExactIOMixin"

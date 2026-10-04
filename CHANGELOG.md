@@ -11,6 +11,10 @@ All notable changes to this project will be documented in this file.
 - Add generic OP, Mekanism Strict Energy and Flux Networks exporters for registered Universal endpoints.
 - Extend `/ueb probe` diagnostics with the matched endpoint registration, block id and BlockEntityType id.
 
+### Fixed
+
+- Restore visibility of Forge-attached UEB/OP/Mekanism/Flux capabilities on Trash Cans versions whose custom `getCapability` does not delegate unknown capabilities to the inherited Forge dispatcher. The compatibility mixin preserves every native Trash Cans capability result and only falls back when the native result is empty.
+
 ### Changed
 
 - Migrate Trash Cans to the generic endpoint registry. Its OP, Mekanism and Flux Networks views are now produced by common protocol exporters rather than three Trash Cans-specific pairwise attachers.

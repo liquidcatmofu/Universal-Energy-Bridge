@@ -137,3 +137,26 @@ The Trash Cans endpoint declares Forge Energy as native, so UEB must not attach 
 Repeat the native route checks from section G. They must work through generic exporters; the old Trash Cans-specific OP/Mek/FN attachers are no longer loaded.
 
 For a failed `/ueb probe`, capture the complete diagnostic line. It now includes endpoint registration, block id and BlockEntityType id so matcher failures can be distinguished from capability/provider failures.
+
+
+## I. Trash Cans attached-capability visibility
+
+alpha.21 adds a narrow Trash Cans mixin for versions whose custom `getCapability` implementation hides capabilities attached through Forge's `AttachCapabilitiesEvent`.
+
+The mixin must preserve every non-empty capability returned by Trash Cans itself. Only when Trash Cans returns an empty `LazyOptional` may it fall back to the inherited Forge-attached capability dispatcher.
+
+With Trash Cans 1.1.1a:
+
+1. Place a fresh Energy Trash Can and Ultimate Trash Can after loading alpha.21.
+2. Run `/ueb probe <pos>`.
+3. Test OP, Mekanism Strict Energy and Flux Networks input separately.
+
+Expected:
+
+- `endpoint=universal_energy_bridge:trashcans_energy_sink`
+- Universal capability is present
+- limit disabled: `canIn=true` and `simIn=9223372036854775807`
+- OP/Mek/FN routes no longer fall back to the Trash Cans Forge Energy `int` path
+- Trash Cans' own item/fluid/Forge Energy capabilities remain unchanged
+
+Repeat once with an existing saved Trash Can and once with a newly placed block to rule out stale BlockEntity instances.
