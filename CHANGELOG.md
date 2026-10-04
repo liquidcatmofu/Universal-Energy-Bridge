@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Harden Flux Plug signed-long buffer arithmetic. Correct the upstream receive-room calculation that subtracts the existing Plug buffer twice when the network limiter wins, guard per-cycle removal accounting against negative overflow, and repair an already-negative Plug buffer to zero on the next transfer cycle so replacement is no longer required.
 - Restore visibility of Forge-attached UEB/OP/Mekanism/Flux capabilities on Trash Cans versions whose custom `getCapability` does not delegate unknown capabilities to the inherited Forge dispatcher. The compatibility mixin preserves every native Trash Cans capability result and only falls back when the native result is empty.
 
 ### Changed

@@ -6,6 +6,7 @@
   "mixins": [
     "flux.NetworkStatisticsMixin",
     "flux.ServerFluxNetworkMixin",
+    "flux.FluxPlugHandlerMixin",
     "mekanism.InventoryFrequencyMixin",
     "draconic.TileEnergyCoreExactIOMixin",
     "draconic.OPStorageOPExactIOMixin",

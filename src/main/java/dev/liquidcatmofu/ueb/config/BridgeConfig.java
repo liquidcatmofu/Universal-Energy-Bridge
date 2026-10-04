@@ -29,8 +29,8 @@ public final class BridgeConfig {
                 .define("fluxNetworksToDraconic", true);
         FLUX_NETWORKS_OVERFLOW_GUARD = builder
                 .comment(
-                        "Patch Flux Networks 1.20 statistics/request aggregation so signed-long sums saturate instead of wrapping negative.",
-                        "This does not lower the per-transfer limit; it only guards aggregate bookkeeping.")
+                        "Patch Flux Networks 1.20 signed-long bookkeeping and Flux Plug buffer arithmetic so overflow/corruption cannot wrap negative.",
+                        "This preserves configured transfer limits while allowing long-capable endpoints to use the full signed-long range.")
                 .define("fluxNetworksOverflowGuard", true);
         DRACONIC_TO_APPLIED_FLUX = builder
                 .comment("Expose Draconic Evolution Energy Pylons as AppliedFlux FE external storage to AE2 storage buses.")

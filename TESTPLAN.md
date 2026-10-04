@@ -160,3 +160,22 @@ Expected:
 - Trash Cans' own item/fluid/Forge Energy capabilities remain unchanged
 
 Repeat once with an existing saved Trash Can and once with a newly placed block to rule out stale BlockEntity instances.
+
+
+## J. Flux Plug long-buffer corruption regression
+
+alpha.22 hardens Flux Plug's own signed-long buffer arithmetic in addition to the existing network/statistics overflow guards.
+
+1. Use a long-capable source capable of multi-EFE/t transfer into a Flux Plug.
+2. Repeatedly switch the Plug between valid networks, disconnect/reconnect it, toggle bypass/limits, and change connected Points while energy is flowing.
+3. Observe the Plug buffer and transfer state without breaking the Plug.
+4. Repeat with buffer values above half of Long.MAX_VALUE.
+
+Expected:
+
+- Plug buffer never becomes negative
+- Plug continues receiving while `buffer < min(device limit, network buffer limiter)`
+- buffer values above Long.MAX_VALUE / 2 do not cause the old double-subtraction receive calculation to stall the Plug
+- an already-negative buffer from a previous build is repaired to 0 by the next Flux network cycle
+- configured transfer limits and side-transfer accounting remain active
+- no block replacement is required to resume transfer
