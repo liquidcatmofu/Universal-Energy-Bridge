@@ -225,3 +225,46 @@ Expected:
 - `DraconicEndpointCompat` is enabled as a setup-time registration
 - legacy `DraconicUniversalCompat`, `DraconicMekanismCompat`, and `DraconicFluxCompat` are no longer enabled as capability attachers
 - reverse-direction `MekanismDraconicCompat` and `FluxDraconicCompat` remain until their source endpoints are migrated
+
+
+## L. Mekanism Energy Cube Endpoint Registry migration
+
+alpha.24 migrates vanilla Mekanism Energy Cubes, including the Creative Energy Cube, to the generic Endpoint Registry while leaving QE, Induction Ports, Mekanism Extras and Universal Cables on the legacy path for now.
+
+### Endpoint and sided Strict Energy
+
+1. Place a normal Energy Cube and a Creative Energy Cube.
+2. Run `/ueb probe <pos>` on each.
+3. Configure different faces as input, output and disabled.
+4. Reconfigure those faces while the blocks remain placed and repeat insertion/extraction tests.
+
+Expected:
+
+- probe reports `endpoint=universal_energy_bridge:mekanism_energy_cube`
+- Universal remains available through the registered endpoint
+- each Universal operation re-resolves the current sided Strict Energy capability
+- input/output/disabled behavior follows Mekanism's current side configuration without replacing the block or recreating the UEB provider
+- `mekanism:strict_energy` is treated as native and is never re-exported by UEB
+- Forge Energy remains native and is not replaced by UEB
+
+### OP export
+
+With Draconic Evolution installed:
+
+1. Enable `mekanismToDraconic`.
+2. Test OP access on each configured cube face.
+3. Disable `mekanismToDraconic` and restart as required.
+
+Expected:
+
+- OP is supplied by the generic exporter only while the config is enabled
+- OP behavior follows the same dynamic Mekanism sided Strict Energy handler as Universal
+- the old `MekanismDraconicCompat` does not attach a second OP view to Energy Cubes
+- QE, Induction Ports, Extras endpoints and Universal Cables still use the old attacher until their migrations
+
+### Flux and AppliedFlux preservation
+
+Expected:
+
+- Energy Cubes do not gain a new Flux Networks capability solely from this migration
+- existing AppliedFlux external-storage behavior remains unchanged and separate from Protocol export

@@ -15,8 +15,12 @@ public final class MekanismCompatTargets {
 
     private MekanismCompatTargets() {}
 
+    public static boolean isEnergyCube(BlockEntity blockEntity) {
+        return blockEntity instanceof TileEntityEnergyCube;
+    }
+
     public static boolean isLargeEnergyEndpoint(BlockEntity blockEntity) {
-        return blockEntity instanceof TileEntityEnergyCube
+        return isEnergyCube(blockEntity)
                 || blockEntity instanceof TileEntityInductionPort
                 || blockEntity instanceof TileEntityQuantumEntangloporter
                 || isMekanismExtrasLargeEnergyEndpoint(blockEntity);

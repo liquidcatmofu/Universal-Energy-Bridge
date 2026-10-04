@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Register Mekanism Energy Cubes, including the Creative Energy Cube, through the generic Endpoint Registry. Native Strict Energy and Forge Energy remain authoritative while Universal resolves the current sided Strict Energy capability lazily.
 - Register Draconic Evolution Energy Pylons and Creative OP sources through the generic side-aware Endpoint Registry. OP is declared native, while Universal and supported exported protocols are provided by the shared runtime.
 - Add per-endpoint dynamic protocol-export conditions so generic exporters can preserve existing config gates and intentionally unsupported protocol combinations.
 - Introduce the first public protocol/conversion/endpoint registration API: protocol identifiers are registry keys rather than a fixed enum, amount domains may use native numeric types, and conversion edges carry exactness/range/rounding/semantic-loss metadata.
@@ -20,6 +21,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Remove Energy Cubes from the legacy Mekanism Universal and Mekanism-to-Draconic attachers. OP export for cubes now comes from the generic exporter and still follows `mekanismToDraconic`; no new Flux capability is introduced during this migration.
+- Keep Mekanism AppliedFlux handling separate from Protocol exposure, so Energy Cubes continue to expose the existing external-storage integration unchanged.
 - Replace the Draconic-specific Universal, Mekanism and Flux capability attachers with one Draconic endpoint registration plus generic protocol exporters. AppliedFlux remains a separate ecosystem integration.
 - Preserve existing behavior during the migration: Energy Pylons respect `draconicToMekanism` and `draconicToFluxNetworks`; Creative OP sources keep their Flux export but do not gain a new Mekanism Strict Energy view.
 - Migrate Trash Cans to the generic endpoint registry. Its OP, Mekanism and Flux Networks views are now produced by common protocol exporters rather than three Trash Cans-specific pairwise attachers.

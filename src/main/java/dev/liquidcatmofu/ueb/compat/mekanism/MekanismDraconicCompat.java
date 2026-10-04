@@ -17,7 +17,8 @@ public final class MekanismDraconicCompat implements BlockEntityCompat {
             return;
         }
         BlockEntity blockEntity = event.getObject();
-        if (!MekanismCompatTargets.isDraconicEndpoint(blockEntity)) {
+        if (MekanismCompatTargets.isEnergyCube(blockEntity)
+                || !MekanismCompatTargets.isDraconicEndpoint(blockEntity)) {
             return;
         }
 

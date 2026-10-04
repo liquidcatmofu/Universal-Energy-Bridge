@@ -36,9 +36,12 @@ public final class CompatDispatcher {
                 "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansEndpointCompat");
         registerRegistrationIfLoaded(new String[]{"draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicEndpointCompat");
+        registerRegistrationIfLoaded(new String[]{"mekanism"},
+                "dev.liquidcatmofu.ueb.compat.mekanism.MekanismEndpointCompat");
 
         // Legacy per-mod Universal capability providers. These migrate to endpoint
-        // registrations incrementally; Draconic endpoints now use the generic runtime.
+        // registrations incrementally; Draconic endpoints and Mekanism Energy Cubes now
+        // use the generic runtime.
         registerIfLoaded(new String[]{"mekanism"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismUniversalCompat");
         registerIfLoaded(new String[]{"fluxnetworks"},

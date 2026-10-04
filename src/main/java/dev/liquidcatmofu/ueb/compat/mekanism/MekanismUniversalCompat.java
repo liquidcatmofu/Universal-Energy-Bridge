@@ -12,7 +12,8 @@ public final class MekanismUniversalCompat implements BlockEntityCompat {
     @Override
     public void attach(AttachCapabilitiesEvent<BlockEntity> event) {
         BlockEntity blockEntity = event.getObject();
-        if (!MekanismCompatTargets.isLargeEnergyEndpoint(blockEntity)) {
+        if (MekanismCompatTargets.isEnergyCube(blockEntity)
+                || !MekanismCompatTargets.isLargeEnergyEndpoint(blockEntity)) {
             return;
         }
 
