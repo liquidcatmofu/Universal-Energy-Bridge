@@ -34,22 +34,18 @@ public final class CompatDispatcher {
         // Setup-time endpoint registrations.
         registerRegistrationIfLoaded(new String[]{"trashcans"},
                 "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansEndpointCompat");
+        registerRegistrationIfLoaded(new String[]{"draconicevolution"},
+                "dev.liquidcatmofu.ueb.compat.draconic.DraconicEndpointCompat");
 
-        // Legacy per-mod Universal capability providers. These will migrate to endpoint
-        // registrations incrementally; keep their current behavior unchanged for alpha.20.
-        registerIfLoaded(new String[]{"draconicevolution"},
-                "dev.liquidcatmofu.ueb.compat.draconic.DraconicUniversalCompat");
+        // Legacy per-mod Universal capability providers. These migrate to endpoint
+        // registrations incrementally; Draconic endpoints now use the generic runtime.
         registerIfLoaded(new String[]{"mekanism"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismUniversalCompat");
         registerIfLoaded(new String[]{"fluxnetworks"},
                 "dev.liquidcatmofu.ueb.compat.flux.FluxUniversalCompat");
 
-        // Existing native high-throughput pairwise views. These remain until source/target
-        // endpoint registrations can replace them without changing transfer ownership.
-        registerIfLoaded(new String[]{"draconicevolution", "mekanism"},
-                "dev.liquidcatmofu.ueb.compat.draconic.DraconicMekanismCompat");
-        registerIfLoaded(new String[]{"draconicevolution", "fluxnetworks"},
-                "dev.liquidcatmofu.ueb.compat.draconic.DraconicFluxCompat");
+        // Remaining reverse-direction native high-throughput pairwise views. Draconic source
+        // endpoints now gain Mek/Flux target views from generic protocol exporters.
         registerIfLoaded(new String[]{"fluxnetworks", "draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.flux.FluxDraconicCompat");
         registerIfLoaded(new String[]{"mekanism", "draconicevolution"},

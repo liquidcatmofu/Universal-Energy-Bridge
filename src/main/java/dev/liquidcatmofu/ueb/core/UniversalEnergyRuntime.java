@@ -137,7 +137,8 @@ public final class UniversalEnergyRuntime {
         }
 
         for (UniversalEndpointExporter exporter : exporters) {
-            if (registration.nativeProtocols().contains(exporter.protocol().id())) {
+            if (registration.nativeProtocols().contains(exporter.protocol().id())
+                    || !registration.shouldExport(exporter.protocol().id())) {
                 continue;
             }
             try {

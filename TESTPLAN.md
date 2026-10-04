@@ -179,3 +179,49 @@ Expected:
 - an already-negative buffer from a previous build is repaired to 0 by the next Flux network cycle
 - configured transfer limits and side-transfer accounting remain active
 - no block replacement is required to resume transfer
+
+
+## K. Draconic Endpoint Registry migration
+
+alpha.23 migrates Draconic Energy Pylons and Creative OP sources from dedicated Universal/Mek/Flux attachers to the generic Endpoint Registry.
+
+### Energy Pylon
+
+1. Run `/ueb probe <pos>` on an Energy Pylon.
+2. Test native OP access.
+3. With `draconicToMekanism=true`, connect a Mekanism Strict Energy consumer/cable.
+4. With `draconicToFluxNetworks=true`, connect a Flux Networks endpoint.
+5. Toggle each config off independently and restart as required by Forge config loading.
+
+Expected:
+
+- probe reports `endpoint=universal_energy_bridge:draconic_energy_pylon`
+- Universal remains lazy and functional even though capability attachment occurs before `opAdapter` initialization
+- native OP is not shadowed or re-exported by UEB
+- Mekanism export appears only when `draconicToMekanism` is enabled
+- Flux export appears only when `draconicToFluxNetworks` is enabled
+- active push behavior and source-side rate ownership remain unchanged
+
+### Creative OP source
+
+1. Run `/ueb probe <pos>`.
+2. Test native OP and Flux Networks output.
+3. Confirm no new Mekanism Strict Energy capability is introduced by this migration.
+
+Expected:
+
+- probe reports `endpoint=universal_energy_bridge:draconic_creative_source`
+- Universal resolves native OP lazily per side
+- native OP remains authoritative
+- Flux export follows `draconicToFluxNetworks`
+- Mekanism Strict Energy remains absent, preserving alpha.22 behavior
+
+### Pairwise attacher removal
+
+Check common-setup logs.
+
+Expected:
+
+- `DraconicEndpointCompat` is enabled as a setup-time registration
+- legacy `DraconicUniversalCompat`, `DraconicMekanismCompat`, and `DraconicFluxCompat` are no longer enabled as capability attachers
+- reverse-direction `MekanismDraconicCompat` and `FluxDraconicCompat` remain until their source endpoints are migrated

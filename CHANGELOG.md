@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Register Draconic Evolution Energy Pylons and Creative OP sources through the generic side-aware Endpoint Registry. OP is declared native, while Universal and supported exported protocols are provided by the shared runtime.
+- Add per-endpoint dynamic protocol-export conditions so generic exporters can preserve existing config gates and intentionally unsupported protocol combinations.
 - Introduce the first public protocol/conversion/endpoint registration API: protocol identifiers are registry keys rather than a fixed enum, amount domains may use native numeric types, and conversion edges carry exactness/range/rounding/semantic-loss metadata.
 - Add a side-aware BlockEntity endpoint registry with lazy Universal endpoint factories and generic Universal-to-protocol exporters.
 - Add generic OP, Mekanism Strict Energy and Flux Networks exporters for registered Universal endpoints.
@@ -18,6 +20,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Replace the Draconic-specific Universal, Mekanism and Flux capability attachers with one Draconic endpoint registration plus generic protocol exporters. AppliedFlux remains a separate ecosystem integration.
+- Preserve existing behavior during the migration: Energy Pylons respect `draconicToMekanism` and `draconicToFluxNetworks`; Creative OP sources keep their Flux export but do not gain a new Mekanism Strict Energy view.
 - Migrate Trash Cans to the generic endpoint registry. Its OP, Mekanism and Flux Networks views are now produced by common protocol exporters rather than three Trash Cans-specific pairwise attachers.
 - Treat Universal signed-long as a registered fallback protocol rather than the architectural assumption that every protocol must route through signed-long.
 - Trash Cans target detection now accepts the Energy/Ultimate block registry ids in addition to the older dedicated BlockEntityType ids, while still avoiding constructor-initialized instance fields.
