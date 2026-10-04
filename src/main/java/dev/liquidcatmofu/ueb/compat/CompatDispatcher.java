@@ -40,6 +40,14 @@ public final class CompatDispatcher {
         registerIfLoaded(new String[]{"mekanism", "draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismDraconicCompat");
 
+        // Trash Cans native high-throughput sink views.
+        registerIfLoaded(new String[]{"trashcans", "draconicevolution"},
+                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansDraconicCompat");
+        registerIfLoaded(new String[]{"trashcans", "mekanism"},
+                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansMekanismCompat");
+        registerIfLoaded(new String[]{"trashcans", "fluxnetworks"},
+                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansFluxCompat");
+
         // Energy Meter native protocol-preserving passthrough.
         registerIfLoaded(new String[]{"energymeter", "draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.energymeter.EnergyMeterDraconicCompat");

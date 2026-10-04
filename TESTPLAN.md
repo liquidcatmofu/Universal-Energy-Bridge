@@ -92,3 +92,17 @@ Expected: simulated Universal insertion is capped at 10,000,000, preserving the 
 Repeat the Trash Cans tests with a current 1.1.1-series build as well as the older 1.0.18-series build.
 
 Expected: placing Energy Trash Can and Ultimate Trash Can must not crash during BlockEntity capability gathering. The compat must not depend on Trash Cans private fields or constructor-initialized state.
+
+
+### Trash Cans native route check
+
+With the Trash Cans energy limit disabled, verify each route independently with a source/network capable of more than `Integer.MAX_VALUE` FE/t:
+
+- Draconic/BrandonsCore OP -> Energy Trash Can
+- Mekanism Strict Energy / Universal Cable -> Energy Trash Can
+- Flux Networks -> Energy Trash Can
+- Repeat with Ultimate Trash Can
+
+Expected: the receiving route must use OP, Strict Energy or FN long capability respectively and must not plateau at 2,147,483,647 FE/t solely because of Forge Energy.
+
+With the Trash Cans energy limit enabled, all native views must still respect the configured Trash Cans limit.
