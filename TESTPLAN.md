@@ -106,3 +106,20 @@ With the Trash Cans energy limit disabled, verify each route independently with 
 Expected: the receiving route must use OP, Strict Energy or FN long capability respectively and must not plateau at 2,147,483,647 FE/t solely because of Forge Energy.
 
 With the Trash Cans energy limit enabled, all native views must still respect the configured Trash Cans limit.
+
+
+### Trash Cans backing-access regression
+
+On Trash Cans 1.1.1-series, run `/ueb probe <pos>` directly on an Energy Trash Can with its transfer limit disabled.
+
+Expected:
+
+- `canIn=true`
+- `simIn=9223372036854775807`
+- `capacity=9223372036854775807`
+
+This specifically verifies that the UEB adapter reads Trash Cans' public limit API instead of depending on a re-entrant Forge Energy capability lookup.
+
+Repeat with the transfer limit enabled at 10,000,000 FE/t.
+
+Expected: `simIn=10000000`.
