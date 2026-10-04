@@ -7,7 +7,7 @@ import java.util.Objects;
 /** Common numeric representations used by built-in scalar energy protocols. */
 public final class StandardAmountDomains {
     public static final AmountDomain<Long> SIGNED_LONG = new AmountDomain<>() {
-        private final ResourceLocation id = id("signed_long");
+        private final ResourceLocation id = StandardAmountDomains.id("signed_long");
 
         @Override
         public ResourceLocation id() {
@@ -31,7 +31,7 @@ public final class StandardAmountDomains {
     };
 
     public static final AmountDomain<Integer> SIGNED_INT = new AmountDomain<>() {
-        private final ResourceLocation id = id("signed_int");
+        private final ResourceLocation id = StandardAmountDomains.id("signed_int");
 
         @Override
         public ResourceLocation id() {
