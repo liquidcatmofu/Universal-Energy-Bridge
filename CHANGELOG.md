@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Introduce the first public protocol/conversion/endpoint registration API: protocol identifiers are registry keys rather than a fixed enum, amount domains may use native numeric types, and conversion edges carry exactness/range/rounding/semantic-loss metadata.
+- Add a side-aware BlockEntity endpoint registry with lazy Universal endpoint factories and generic Universal-to-protocol exporters.
+- Add generic OP, Mekanism Strict Energy and Flux Networks exporters for registered Universal endpoints.
+- Extend `/ueb probe` diagnostics with the matched endpoint registration, block id and BlockEntityType id.
+
+### Changed
+
+- Migrate Trash Cans to the generic endpoint registry. Its OP, Mekanism and Flux Networks views are now produced by common protocol exporters rather than three Trash Cans-specific pairwise attachers.
+- Treat Universal signed-long as a registered fallback protocol rather than the architectural assumption that every protocol must route through signed-long.
+- Trash Cans target detection now accepts the Energy/Ultimate block registry ids in addition to the older dedicated BlockEntityType ids, while still avoiding constructor-initialized instance fields.
+
 ## [0.1.0-alpha.15] - 2026-10-04
 
 ### Fixed

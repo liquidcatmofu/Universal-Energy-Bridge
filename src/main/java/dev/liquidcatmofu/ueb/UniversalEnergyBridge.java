@@ -6,6 +6,7 @@ import dev.liquidcatmofu.ueb.command.UebCommands;
 import dev.liquidcatmofu.ueb.compat.CompatDispatcher;
 import dev.liquidcatmofu.ueb.config.BridgeConfig;
 import dev.liquidcatmofu.ueb.config.BridgeServerConfig;
+import dev.liquidcatmofu.ueb.core.UniversalEnergyRuntime;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
@@ -44,6 +45,7 @@ public final class UniversalEnergyBridge {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
+        UniversalEnergyRuntime.initialize();
         CompatDispatcher.initialize();
     }
 
@@ -52,6 +54,7 @@ public final class UniversalEnergyBridge {
     }
 
     private void attachCapabilities(AttachCapabilitiesEvent<BlockEntity> event) {
+        UniversalEnergyRuntime.attach(event);
         CompatDispatcher.attach(event);
     }
 

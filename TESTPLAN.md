@@ -68,7 +68,6 @@ Then deliberately connect the same physical storage through multiple networks (f
 
 Disable individual compat paths in the UEB config to isolate any loop.
 
-
 ## G. Trash Cans long sink
 
 1. Place an Energy Trash Can or Ultimate Trash Can.
@@ -86,13 +85,11 @@ Then enable the Trash Cans transfer limit and set it to 10,000,000 FE/t.
 
 Expected: simulated Universal insertion is capped at 10,000,000, preserving the Trash Cans setting instead of bypassing it.
 
-
 ### Trash Cans constructor/regression check
 
 Repeat the Trash Cans tests with a current 1.1.1-series build as well as the older 1.0.18-series build.
 
 Expected: placing Energy Trash Can and Ultimate Trash Can must not crash during BlockEntity capability gathering. The compat must not depend on Trash Cans private fields or constructor-initialized state.
-
 
 ### Trash Cans native route check
 
@@ -107,19 +104,36 @@ Expected: the receiving route must use OP, Strict Energy or FN long capability r
 
 With the Trash Cans energy limit enabled, all native views must still respect the configured Trash Cans limit.
 
-
 ### Trash Cans backing-access regression
 
 On Trash Cans 1.1.1-series, run `/ueb probe <pos>` directly on an Energy Trash Can with its transfer limit disabled.
 
 Expected:
 
+- `endpoint=universal_energy_bridge:trashcans_energy_sink`
 - `canIn=true`
 - `simIn=9223372036854775807`
 - `capacity=9223372036854775807`
 
-This specifically verifies that the UEB adapter reads Trash Cans' public limit API instead of depending on a re-entrant Forge Energy capability lookup.
+This verifies both the new endpoint registry match and that the UEB adapter reads Trash Cans' public limit API instead of depending on a re-entrant Forge Energy capability lookup.
 
 Repeat with the transfer limit enabled at 10,000,000 FE/t.
 
 Expected: `simIn=10000000`.
+
+## H. Endpoint registry / protocol exporter regression
+
+alpha.20 moves Trash Cans to the generic endpoint registry. With Draconic Evolution, Mekanism and Flux Networks installed, check the log during common setup.
+
+Expected registrations include:
+
+- endpoint `universal_energy_bridge:trashcans_energy_sink`
+- protocol exporter `brandonscore:op`
+- protocol exporter `mekanism:strict_energy`
+- protocol exporter `fluxnetworks:energy`
+
+The Trash Cans endpoint declares Forge Energy as native, so UEB must not attach a second Forge Energy view.
+
+Repeat the native route checks from section G. They must work through generic exporters; the old Trash Cans-specific OP/Mek/FN attachers are no longer loaded.
+
+For a failed `/ueb probe`, capture the complete diagnostic line. It now includes endpoint registration, block id and BlockEntityType id so matcher failures can be distinguished from capability/provider failures.

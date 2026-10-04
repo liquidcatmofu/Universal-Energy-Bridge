@@ -1,6 +1,8 @@
 package dev.liquidcatmofu.ueb.compat;
 
 import dev.liquidcatmofu.ueb.UniversalEnergyBridge;
+import dev.liquidcatmofu.ueb.api.UniversalEnergyRegistration;
+import dev.liquidcatmofu.ueb.api.endpoint.UniversalEndpointExporter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.ModList;
@@ -20,17 +22,30 @@ public final class CompatDispatcher {
         }
         initialized = true;
 
-        // Universal capability providers.
+        // Generic Universal-backed protocol exporters. Any endpoint registered with the
+        // runtime automatically gains these views unless it declares the protocol native.
+        registerExporterIfLoaded(new String[]{"draconicevolution"},
+                "dev.liquidcatmofu.ueb.compat.draconic.DraconicUniversalExporter");
+        registerExporterIfLoaded(new String[]{"mekanism"},
+                "dev.liquidcatmofu.ueb.compat.mekanism.MekanismUniversalExporter");
+        registerExporterIfLoaded(new String[]{"fluxnetworks"},
+                "dev.liquidcatmofu.ueb.compat.flux.FluxUniversalExporter");
+
+        // Setup-time endpoint registrations.
+        registerRegistrationIfLoaded(new String[]{"trashcans"},
+                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansEndpointCompat");
+
+        // Legacy per-mod Universal capability providers. These will migrate to endpoint
+        // registrations incrementally; keep their current behavior unchanged for alpha.20.
         registerIfLoaded(new String[]{"draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicUniversalCompat");
         registerIfLoaded(new String[]{"mekanism"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismUniversalCompat");
         registerIfLoaded(new String[]{"fluxnetworks"},
                 "dev.liquidcatmofu.ueb.compat.flux.FluxUniversalCompat");
-        registerIfLoaded(new String[]{"trashcans"},
-                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansUniversalCompat");
 
-        // Native high-throughput views.
+        // Existing native high-throughput pairwise views. These remain until source/target
+        // endpoint registrations can replace them without changing transfer ownership.
         registerIfLoaded(new String[]{"draconicevolution", "mekanism"},
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicMekanismCompat");
         registerIfLoaded(new String[]{"draconicevolution", "fluxnetworks"},
@@ -40,14 +55,6 @@ public final class CompatDispatcher {
         registerIfLoaded(new String[]{"mekanism", "draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.mekanism.MekanismDraconicCompat");
 
-        // Trash Cans native high-throughput sink views.
-        registerIfLoaded(new String[]{"trashcans", "draconicevolution"},
-                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansDraconicCompat");
-        registerIfLoaded(new String[]{"trashcans", "mekanism"},
-                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansMekanismCompat");
-        registerIfLoaded(new String[]{"trashcans", "fluxnetworks"},
-                "dev.liquidcatmofu.ueb.compat.trashcans.TrashCansFluxCompat");
-
         // Energy Meter native protocol-preserving passthrough.
         registerIfLoaded(new String[]{"energymeter", "draconicevolution"},
                 "dev.liquidcatmofu.ueb.compat.energymeter.EnergyMeterDraconicCompat");
@@ -56,7 +63,7 @@ public final class CompatDispatcher {
         registerIfLoaded(new String[]{"energymeter", "fluxnetworks"},
                 "dev.liquidcatmofu.ueb.compat.energymeter.EnergyMeterFluxCompat");
 
-        // AE2/AppliedFlux external storage views.
+        // AE2/AppliedFlux ecosystem integration remains separate from protocol registration.
         registerIfLoaded(new String[]{"draconicevolution", "ae2", "appflux"},
                 "dev.liquidcatmofu.ueb.compat.draconic.DraconicAppliedFluxCompat");
         registerIfLoaded(new String[]{"mekanism", "ae2", "appflux"},
@@ -64,10 +71,8 @@ public final class CompatDispatcher {
     }
 
     private static void registerIfLoaded(String[] modIds, String className) {
-        for (String modId : modIds) {
-            if (!ModList.get().isLoaded(modId)) {
-                return;
-            }
+        if (!allLoaded(modIds)) {
+            return;
         }
         try {
             Class<?> type = Class.forName(className);
@@ -76,6 +81,45 @@ public final class CompatDispatcher {
         } catch (ReflectiveOperationException | LinkageError e) {
             UniversalEnergyBridge.LOGGER.error("Failed to enable compat attacher {}", className, e);
         }
+    }
+
+    private static void registerRegistrationIfLoaded(String[] modIds, String className) {
+        if (!allLoaded(modIds)) {
+            return;
+        }
+        try {
+            Class<?> type = Class.forName(className);
+            CompatRegistration registration =
+                    (CompatRegistration) type.getDeclaredConstructor().newInstance();
+            registration.register();
+            UniversalEnergyBridge.LOGGER.info("Enabled compat registration {}", className);
+        } catch (ReflectiveOperationException | LinkageError | RuntimeException e) {
+            UniversalEnergyBridge.LOGGER.error("Failed to enable compat registration {}", className, e);
+        }
+    }
+
+    private static void registerExporterIfLoaded(String[] modIds, String className) {
+        if (!allLoaded(modIds)) {
+            return;
+        }
+        try {
+            Class<?> type = Class.forName(className);
+            UniversalEndpointExporter exporter =
+                    (UniversalEndpointExporter) type.getDeclaredConstructor().newInstance();
+            UniversalEnergyRegistration.registerExporter(exporter);
+            UniversalEnergyBridge.LOGGER.info("Enabled protocol exporter {}", className);
+        } catch (ReflectiveOperationException | LinkageError | RuntimeException e) {
+            UniversalEnergyBridge.LOGGER.error("Failed to enable protocol exporter {}", className, e);
+        }
+    }
+
+    private static boolean allLoaded(String[] modIds) {
+        for (String modId : modIds) {
+            if (!ModList.get().isLoaded(modId)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void attach(AttachCapabilitiesEvent<BlockEntity> event) {
