@@ -60,8 +60,6 @@ dependencies {
     compileOnly fg.deobf('curse.maven:applied-flux-965012:7651647')
     compileOnly fg.deobf('curse.maven:glodium-957920:5226922')
     compileOnly fg.deobf('curse.maven:energymeter-532169:7676339')
-    compileOnly fg.deobf('curse.maven:trash-cans-394535:4712179')
-    compileOnly fg.deobf('curse.maven:supermartijn642s-core-lib-454372:4601830')
 
     // Jade 1.20.1 API is bundled in the normal jar. Compile-only keeps Jade optional at runtime.
     compileOnly fg.deobf('curse.maven:jade-324717:8479276')

@@ -85,3 +85,10 @@ Expected with the limit disabled:
 Then enable the Trash Cans transfer limit and set it to 10,000,000 FE/t.
 
 Expected: simulated Universal insertion is capped at 10,000,000, preserving the Trash Cans setting instead of bypassing it.
+
+
+### Trash Cans constructor/regression check
+
+Repeat the Trash Cans tests with a current 1.1.1-series build as well as the older 1.0.18-series build.
+
+Expected: placing Energy Trash Can and Ultimate Trash Can must not crash during BlockEntity capability gathering. The compat must not depend on Trash Cans private fields or constructor-initialized state.
